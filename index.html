@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Faisability | Faisabilité hypothécaire gratuite en Suisse romande</title>
+<meta property="og:title" content="Faisability : testez la faisabilité de votre hypothèque">
+<meta property="og:description" content="Achat, construction ou renouvellement : le calcul de la banque, frais de notaire compris, puis les offres de plusieurs prêteurs.">
+<meta property="og:locale" content="fr_CH">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Faisabilité hypothécaire gratuite en Suisse romande : testez votre achat ou le renouvellement de votre hypothèque, frais de notaire compris, puis comparez les offres de plusieurs prêteurs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=Manrope:wght@500;600;700&display=swap">
+<style>
+/* Layout: split hero — promesse à gauche, calculateur vivant à droite ; puis formulaire, étapes, FAQ en colonne simple */
+:root{
+  /* Palette « Bleu Léman & soleil » */
+  --bg:#E3ECFF; --surface:#FFFFFF; --ink:#13213C; --muted:#53607A; --line:#C7D6F5;
+  --fir:#2453E0; --fir-ink:#FFFFFF; --ochre:#C26A00;
+  --ok:#1E7A4C; --warn:#A86A0B; --bad:#B23A2E; --ok-bg:#E3F2EA; --warn-bg:#FBF0DD; --bad-bg:#F8E3E0;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --num:"Manrope",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1428; --surface:#141F3A; --ink:#E6ECFA; --muted:#9DABC7; --line:#273659;
+  --fir:#82A7FF; --fir-ink:#0C1428; --ochre:#FFB547;
+  --ok:#6FCF9B; --warn:#E8B45A; --bad:#EE8A7E; --ok-bg:#16302A; --warn-bg:#33281A; --bad-bg:#3A201D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1428; --surface:#141F3A; --ink:#E6ECFA; --muted:#9DABC7; --line:#273659;
+  --fir:#82A7FF; --fir-ink:#0C1428; --ochre:#FFB547;
+  --ok:#6FCF9B; --warn:#E8B45A; --bad:#EE8A7E; --ok-bg:#16302A; --warn-bg:#33281A; --bad-bg:#3A201D; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--fir)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+header.top{padding-block:20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font:700 21px var(--display);color:var(--ink);text-decoration:none}
+.brand svg{width:30px;height:30px}
+.nav{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nav a{padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:600;font-size:15px;color:var(--muted);border:1px solid transparent}
+.nav a[aria-current="page"]{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.nav a:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+.band.first{border-top:0;padding-block:24px 64px}
+.opt{font-weight:400;color:var(--muted)}
+.booking{border:1px solid var(--line);border-radius:10px;padding:16px;margin:0;display:grid;gap:12px;background:var(--surface);min-width:0}
+.booking legend{font-weight:600;font-size:14px;padding:0 6px}
+.booking .hint{margin:0;font-size:13px;color:var(--muted)}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;min-width:0}
+.days button{flex:none;display:grid;gap:2px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:600 14px var(--body);cursor:pointer;text-align:center;text-transform:capitalize}
+.days button small{font-weight:400;font-size:12px;color:var(--muted)}
+.times{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.times button{padding:9px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:500 15px var(--num);cursor:pointer}
+.days button[aria-pressed="true"],.times button[aria-pressed="true"]{background:var(--fir);border-color:var(--fir);color:var(--fir-ink)}
+.days button[aria-pressed="true"] small{color:inherit}
+.days button:focus-visible,.times button:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+.booking.off .days,.booking.off .times,.booking.off .picked{opacity:.35;pointer-events:none}
+.picked{margin:0;font-weight:600;color:var(--fir);min-height:1.4em}
+.picked::first-letter{text-transform:uppercase}
+.empty{margin:0;color:var(--muted);font-size:14px}
+
+.hero{display:grid;grid-template-columns:1fr minmax(0,500px);gap:48px;align-items:start;padding-block:24px 64px}
+.hero>*{min-width:0}
+.eyebrow{font:600 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--ochre)}
+.hero h1{font-size:clamp(36px,5.2vw,60px);font-weight:700;margin:14px 0 18px;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--fir)}
+.lede{color:var(--muted);font-size:19px;max-width:34em;margin:0 0 28px}
+.proofs{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.proofs li{display:flex;gap:12px;align-items:baseline}
+.proofs li::before{content:"";flex:none;width:10px;height:10px;border-radius:2px;background:var(--fir);transform:translateY(-1px)}
+
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -24px rgba(19,33,60,.35);overflow:hidden}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.tabs button{font:600 15px var(--body);padding:14px 10px;border:0;background:transparent;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
+.t-short{display:none}
+@media (max-width:520px){.t-long{display:none}.t-short{display:inline}}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--fir)}
+.tabs button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ochre);outline-offset:2px}
+.calc-body{padding:22px;display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field label{font-weight:600;font-size:14px}
+.field .hint{font-size:13px;color:var(--muted)}
+.money{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+.money span{padding:0 10px 0 12px;font:500 14px var(--num);color:var(--muted)}
+.money input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 18px var(--num);padding:11px 12px 11px 0}
+input,select,textarea{font:inherit;color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row2>*{min-width:0}
+.row-prix{grid-template-columns:minmax(0,1fr) 120px}
+.money .age-input{padding-left:12px;-moz-appearance:textfield}
+.money .age-input::-webkit-outer-spin-button,.money .age-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.age-hint{margin:0;font-size:14px}
+.sale-note{margin:0;padding:10px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:14px;line-height:1.5;color:var(--ink)}
+.age-hint a{font-weight:600}
+
+.result{border-top:1px dashed var(--line);padding-top:16px;display:grid;gap:12px}
+.verdict{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;font-weight:600}
+.verdict .dot{width:10px;height:10px;border-radius:50%;background:currentColor;flex:none}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.warn{background:var(--warn-bg);color:var(--warn)} .verdict.bad{background:var(--bad-bg);color:var(--bad)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0}
+.metrics div{display:grid;gap:2px}
+.metrics dt{font-size:13px;color:var(--muted)}
+.metrics dd{margin:0;font:500 18px var(--num);font-variant-numeric:tabular-nums}
+.gauge{height:8px;border-radius:4px;background:var(--line);position:relative}
+.gauge i{position:absolute;inset:0 auto 0 0;border-radius:4px;background:var(--fir);transition:width .3s}
+.gauge b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);left:66.7%}
+.gauge-legend{display:flex;justify-content:space-between;font:500 12px var(--num);color:var(--muted)}
+.fine{font-size:13px;color:var(--muted);margin:0}
+
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;font:600 17px var(--body);padding:14px 22px;border-radius:10px;border:0;cursor:pointer;background:var(--fir);color:var(--fir-ink);text-decoration:none}
+.btn.wide{width:100%}
+
+section.band{padding-block:64px;border-top:1px solid var(--line)}
+section h2{font-size:clamp(28px,3.6vw,40px);margin-bottom:12px;letter-spacing:-.01em}
+.sub{color:var(--muted);max-width:40em;margin:0 0 32px}
+
+.lead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:48px;align-items:start}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:10px}
+.summary h3{font-size:18px}
+.summary dl{margin:0;display:grid;gap:8px}
+.summary dl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:6px;font-size:15px}
+.summary dd{margin:0;font-family:var(--num);font-variant-numeric:tabular-nums;text-align:right}
+.office{margin-top:16px;padding:20px;border-radius:12px;border:1px solid var(--line);display:grid;gap:8px;font-size:15px}
+.office h3{font-size:18px}
+.advisor{display:flex;gap:14px;align-items:center;padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+.advisor div{display:grid;gap:2px}
+.advisor strong{font:700 18px var(--display)}
+.advisor span:not(.avatar){color:var(--muted);font-size:14px}
+.avatar{width:56px;height:56px;flex:none;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--fir);color:var(--fir-ink);font:700 18px var(--display)}
+.office address{font-style:normal}
+.office .hours{margin:0;display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:8px}
+.office a{font-weight:600}
+.legal{display:grid;gap:4px}
+.legal .ids{font-family:var(--num);font-size:13px}
+form.contact{display:grid;gap:16px}
+.contact input,.contact select,.contact textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:11px 12px}
+.contact textarea{min-height:90px;resize:vertical}
+.situation{border:1px solid var(--line);border-radius:10px;padding:16px;margin:0;display:grid;gap:10px;background:var(--surface)}
+.situation legend{font-weight:600;font-size:14px;padding:0 6px}
+.situation .opt{font-weight:400;color:var(--muted)}
+.situation .hint{margin:0;font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{cursor:pointer}
+.chips input{position:absolute;opacity:0;width:1px;height:1px}
+.chips span{display:inline-block;padding:7px 12px;border:1px solid var(--line);border-radius:999px;font-size:14px;background:var(--bg);transition:background .15s,border-color .15s}
+.chips input:checked+span{background:var(--fir);border-color:var(--fir);color:var(--fir-ink)}
+.chips input:focus-visible+span{outline:2px solid var(--ochre);outline-offset:2px}
+.msg-label{font-weight:600;font-size:14px;margin-top:4px}
+.situation textarea{background:var(--bg)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted)}
+.check input{width:18px;height:18px;margin-top:2px;flex:none}
+.err{color:var(--bad);font-size:14px;margin:0}
+.thanks{background:var(--ok-bg);color:var(--ink);border-radius:12px;padding:24px;display:grid;gap:8px}
+.thanks h3{color:var(--ok)}
+
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;gap:8px;align-content:start}
+.steps li::before{content:counter(s);font:700 15px var(--num);width:34px;height:34px;display:grid;place-items:center;border:2px solid var(--fir);color:var(--fir);border-radius:50%}
+.steps h3{font-size:20px}
+.steps p{margin:0;color:var(--muted)}
+
+.faq{display:grid;gap:10px;max-width:780px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.faq summary{font-weight:600;cursor:pointer}
+.faq p{color:var(--muted);margin:10px 0 0}
+.faq ul{color:var(--muted);margin:10px 0 0;padding-left:20px;display:grid;gap:6px}
+.faq strong{color:var(--ink)}
+
+.topbar{background:var(--fir);color:var(--fir-ink);font-size:14px}
+.topbar-in{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 14px;padding-block:9px;text-align:center}
+.topbar a{color:var(--fir-ink);font-weight:600;text-underline-offset:3px}
+.topbar a:focus-visible{outline:2px solid var(--fir-ink);outline-offset:2px}
+.retire-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:48px;align-items:start}
+.retire-text{display:grid;gap:14px;align-content:start}
+.retire-text p{margin:0;color:var(--muted);max-width:36em}
+.retire-text h2{margin-bottom:4px}
+@media (max-width:860px){.retire-grid{grid-template-columns:1fr;gap:28px}}
+.best{margin-top:28px;display:grid;gap:12px;max-width:34em}
+.best-head{display:flex;justify-content:space-between;gap:12px;font:600 12px var(--body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.best-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0}
+.best-grid div{display:grid;gap:4px;min-width:0;padding:12px 14px;border:1.5px solid var(--fir);border-radius:12px;background:var(--surface)}
+.best-grid dt{font:600 12px var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.best-grid dd{margin:0;font:700 24px/1.1 var(--num);font-variant-numeric:tabular-nums;color:var(--fir);letter-spacing:-.01em}
+.best a{font-weight:600;font-size:15px}
+@media (max-width:420px){.best-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rates-list{display:grid;gap:8px;max-width:820px}
+.rate-row{display:grid;grid-template-columns:minmax(0,1.3fr) 104px minmax(0,1fr) 130px;align-items:center;gap:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.rate-row .name{font-weight:600}
+.rate-row .name small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.rate-row .rate{justify-self:start;font:700 15px var(--num);font-variant-numeric:tabular-nums;color:var(--fir);border:1.5px solid var(--fir);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.rate-row .bar{height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.rate-row .bar i{position:absolute;inset:0 auto 0 0;background:var(--fir);border-radius:3px;transition:width .3s}
+.rate-row .cost{text-align:right;font:500 17px var(--num);font-variant-numeric:tabular-nums}
+.rate-row .cost small{font:400 12px var(--body);color:var(--muted)}
+.rates .fine{margin-top:14px;max-width:820px}
+@media (max-width:560px){.rate-row{grid-template-columns:1fr auto;gap:8px 12px}.rate-row .rate{order:2;justify-self:end}.rate-row .bar{grid-column:1/-1;order:4}.rate-row .cost{order:3;grid-column:1/-1;text-align:left}}
+.partners{padding-block:28px 32px;border-top:1px solid var(--line)}
+.partners-count{margin:0;display:flex;align-items:center;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:17px}
+.partners-count .big{font:700 44px/1 var(--num);color:var(--fir);font-variant-numeric:tabular-nums}
+.partners-count span:last-child{min-width:0;flex:1 1 260px;max-width:40em}
+.doc{max-width:760px;padding-block:24px 72px;display:grid;gap:14px}
+.doc h1{font-size:clamp(32px,4.4vw,48px);letter-spacing:-.02em;margin:6px 0 0}
+.doc h2{font-size:21px;margin-top:22px}
+.doc p,.doc ul{margin:0;color:var(--muted);max-width:65ch}
+.doc ul{padding-left:20px;display:grid;gap:6px}
+.doc strong{color:var(--ink)}
+.doc .updated{font-size:14px}
+.check a{color:var(--fir)}
+footer{padding-block:32px 48px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+@media (max-width:860px){
+  .hero,.lead{grid-template-columns:1fr;gap:32px}
+  .steps{grid-template-columns:1fr}
+}
+@media (max-width:420px){.row2,.metrics{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <span>Bientôt à la retraite&nbsp;? Votre banque refera le calcul de votre hypothèque avec votre rente.</span>
+    <a href="#retraite">Vérifier si je peux garder mon bien</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 17 16 5l13 12" fill="none" stroke="var(--fir)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><rect x="9" y="17" width="14" height="10" rx="1.5" fill="var(--ochre)"/></svg>
+      Faisability
+    </a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#" id="nav-home">Simulation</a>
+      <a href="#contact" id="nav-contact">Nous contacter</a>
+    </nav>
+  </header>
+
+  <main>
+  <div id="view-home">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Faisabilité hypothécaire gratuite · Vaud et Suisse romande</div>
+        <h1>Testez la faisabilité de votre hypothèque <em>avant</em> d'aller à la banque.</h1>
+        <p class="lede">Entrez le prix, vos fonds propres et votre revenu. Le simulateur applique les règles des prêteurs suisses, frais de notaire compris. Ensuite, Andrea Guyon met plusieurs prêteurs en concurrence sur votre dossier.</p>
+        <ul class="proofs">
+          <li>Droits de mutation et frais de notaire intégrés au calcul</li>
+          <li>Les offres de 40 prêteurs comparées sur un seul dossier</li>
+          <li>Vous choisissez vous-même l'heure de l'appel</li>
+        </ul>
+        <div class="best" aria-labelledby="best-title">
+          <div class="best-head"><span id="best-title">Meilleurs taux indicatifs du marché</span><span class="num" id="best-date"></span></div>
+          <dl class="best-grid" id="best-grid"></dl>
+          <a href="#taux">Voir ce que ces taux donnent pour vous</a>
+        </div>
+      </div>
+
+      <div class="calc" id="calc">
+        <div class="tabs" role="tablist">
+          <button role="tab" id="tab-achat" aria-selected="true" data-mode="achat"><span class="t-long">Acheter ou construire</span><span class="t-short">Acheter</span></button>
+          <button role="tab" id="tab-renouv" aria-selected="false" data-mode="renouv"><span class="t-long">Renouveler mon hypothèque</span><span class="t-short">Renouveler</span></button>
+          <button role="tab" id="tab-vente" aria-selected="false" data-mode="vente"><span class="t-long">Vendre mon bien</span><span class="t-short">Vendre</span></button>
+        </div>
+        <div class="calc-body">
+          <div class="row2 row-prix">
+            <div class="field">
+              <label for="prix" id="prix-label">Prix du bien</label>
+              <div class="money"><span>CHF</span><input id="prix" inputmode="numeric" value="950 000"></div>
+            </div>
+            <div class="field">
+              <label for="age">Votre âge</label>
+              <div class="money"><input id="age" type="number" inputmode="numeric" min="18" max="99" value="40" class="age-input"><span>ans</span></div>
+            </div>
+          </div>
+          <div class="field" id="f-fp">
+            <label for="fp">Fonds propres disponibles</label>
+            <div class="money"><span>CHF</span><input id="fp" inputmode="numeric" value="260 000"></div>
+            <span class="hint">Épargne, 3e pilier, 2e pilier (au moins 10&nbsp;% du prix hors 2e pilier)</span>
+          </div>
+          <div class="field" id="f-hypo" hidden>
+            <label for="hypo" id="hypo-label">Hypothèque actuelle</label>
+            <div class="money"><span>CHF</span><input id="hypo" inputmode="numeric" value="600 000"></div>
+          </div>
+          <div class="field" id="f-vprojet" hidden>
+            <label for="vprojet">Après la vente</label>
+            <select id="vprojet" class="money" style="padding:11px 12px">
+              <option>Je rachète un autre bien</option>
+              <option>Je deviens locataire</option>
+              <option>Je ne sais pas encore</option>
+            </select>
+          </div>
+          <div class="row2">
+            <div class="field" id="f-rev">
+              <label for="rev">Revenu brut annuel du ménage</label>
+              <div class="money"><span>CHF</span><input id="rev" inputmode="numeric" value="165 000"></div>
+            </div>
+            <div class="field" id="f-ech" hidden>
+              <label for="ech" id="ech-label">Échéance actuelle</label>
+              <input id="ech" type="month" class="money" style="padding:10px 12px;font:500 16px var(--num)">
+            </div>
+            <div class="field" id="f-canton">
+              <label for="canton" id="canton-label">Canton du bien</label>
+              <select id="canton" class="money" style="padding:11px 12px">
+                <option>Vaud</option><option>Genève</option><option>Fribourg</option><option>Valais</option><option>Neuchâtel</option><option>Jura</option><option>Berne</option><option>Autre canton</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" id="f-credits">
+            <label for="credits">Leasings et crédits à la consommation</label>
+            <div class="money"><span>CHF</span><input id="credits" inputmode="numeric" value="0"><span>/ mois</span></div>
+            <span class="hint">Total de vos mensualités. Les prêteurs les déduisent de votre revenu avant de calculer ce que vous pouvez supporter.</span>
+          </div>
+
+          <div class="result" aria-live="polite">
+            <div class="verdict ok" id="verdict"><span class="dot"></span><span id="verdict-text"></span></div>
+            <p class="fine age-hint" id="age-hint" hidden></p>
+            <p class="sale-note" id="sale-note" hidden>Faisability travaille en étroite collaboration avec des courtiers immobiliers pour la vente de votre bien. Estimation, mise en vente et financement de votre prochain achat : un seul interlocuteur coordonne le tout.</p>
+            <div id="gauge-wrap">
+              <div class="gauge"><i id="gauge"></i><b title="Limite de 33 %"></b></div>
+              <div class="gauge-legend"><span>0&nbsp;%</span><span>33&nbsp;% limite</span><span>50&nbsp;%</span></div>
+            </div>
+            <dl class="metrics">
+              <div><dt id="m1l">Hypothèque</dt><dd id="m-hypo"></dd></div>
+              <div><dt id="m2l">Taux de financement</dt><dd id="m-ltv"></dd></div>
+              <div><dt id="m3l">Frais d'achat estimés</dt><dd id="m3"></dd></div>
+              <div><dt id="m4l">Fonds propres après frais</dt><dd id="m4"></dd></div>
+              <div><dt id="m5l">Charges théoriques / an</dt><dd id="m-charges"></dd></div>
+              <div><dt id="m-last-label">Prix maximal estimé</dt><dd id="m-last"></dd></div>
+            </dl>
+            <a class="btn wide" href="#demande" id="calc-cta">Recevoir mes offres de taux</a>
+            <p class="fine" id="calc-note">Calcul indicatif : taux théorique de 5&nbsp;%, amortissement jusqu'à 2/3 de la valeur en 15&nbsp;ans au plus (terminé à 65&nbsp;ans), 1&nbsp;% de frais d'entretien, et frais d'achat estimés selon le canton (droits de mutation, notaire, registre foncier).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="band retire" id="retraite">
+      <div class="retire-grid">
+        <div class="retire-text">
+          <div class="eyebrow">Propriétaires de plus de 55 ans</div>
+          <h2>Pourrez-vous garder votre bien à la retraite&nbsp;?</h2>
+          <p>À la retraite, votre revenu baisse : les rentes AVS et de caisse de pension remplacent souvent autour de 60&nbsp;% de l'ancien salaire. Votre dette hypothécaire, elle, ne change pas.</p>
+          <p>Au prochain renouvellement, le prêteur refait le calcul avec ce nouveau revenu. Si vos charges dépassent un tiers de votre rente, il peut exiger un amortissement, voire refuser de prolonger le prêt.</p>
+          <p>Mieux vaut comparer votre dette à votre future rente 5 à 10 ans avant la retraite. Vous avez alors le temps d'amortir, d'utiliser votre 3e pilier ou de trouver un prêteur plus souple.</p>
+        </div>
+        <div class="calc">
+          <div class="calc-body">
+            <div class="field">
+              <label for="r-valeur">Valeur estimée de votre bien</label>
+              <div class="money"><span>CHF</span><input id="r-valeur" inputmode="numeric" value="1 200 000"></div>
+            </div>
+            <div class="field">
+              <label for="r-hypo">Hypothèque restante</label>
+              <div class="money"><span>CHF</span><input id="r-hypo" inputmode="numeric" value="600 000"></div>
+            </div>
+            <div class="field">
+              <label for="r-rev">Revenu annuel prévu à la retraite</label>
+              <div class="money"><span>CHF</span><input id="r-rev" inputmode="numeric" value="95 000"></div>
+              <span class="hint">AVS, caisse de pension et autres revenus du ménage. Votre certificat de prévoyance indique la rente prévue.</span>
+            </div>
+            <div class="result" aria-live="polite">
+              <div class="verdict ok" id="r-verdict"><span class="dot"></span><span id="r-verdict-text"></span></div>
+              <dl class="metrics">
+                <div><dt>Charges théoriques / an</dt><dd id="r-ch"></dd></div>
+                <div><dt>Part de votre rente</dt><dd id="r-ratio"></dd></div>
+                <div><dt>Hypothèque supportable</dt><dd id="r-supp"></dd></div>
+                <div><dt>À amortir d'ici la retraite</dt><dd id="r-amort"></dd></div>
+              </dl>
+              <a class="btn wide" href="#demande" id="r-cta">Préparer ma retraite avec un conseiller</a>
+              <p class="fine">Calcul indicatif : taux théorique de 5&nbsp;% et 1&nbsp;% de frais d'entretien, comparés à un tiers du revenu de retraite. Certains prêteurs sont plus souples avec les retraités.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band rates" id="taux">
+      <h2>Ce que votre hypothèque coûterait vraiment</h2>
+      <p class="sub">La banque calcule avec 5&nbsp;% pour se protéger. Les taux pratiqués aujourd'hui sont bien plus bas. Voici vos intérêts mensuels pour <strong class="num" id="r-loan"></strong>, selon la durée choisie.</p>
+      <div class="rates-list" id="rates-list"></div>
+      <p class="fine" id="rates-note"></p>
+    </section>
+
+    <section class="partners" aria-label="Prêteurs partenaires">
+      <p class="partners-count"><span class="big">40</span><span>prêteurs comparés sur votre dossier : banques, assurances, caisses de pension et fonds de placement.</span></p>
+    </section>
+
+    <section class="band" id="demande">
+      <div class="lead">
+        <div>
+          <h2>Recevez vos offres</h2>
+          <p class="sub">Andrea Guyon vérifie votre dossier, le soumet à 40 prêteurs et vous présente les meilleures conditions. Vous ne transmettez vos documents qu'une seule fois.</p>
+          <div class="summary">
+            <h3>Votre simulation</h3>
+            <p class="fine" id="summary-note">Ce sont des valeurs d'exemple. Modifiez le calculateur pour voir votre cas, ou envoyez votre demande telle quelle : nous parlerons des chiffres au téléphone.</p>
+            <dl id="summary"></dl>
+          </div>
+          <div class="office">
+            <div class="advisor">
+              <!-- Pour une photo : remplacez le <span class="avatar"> par <img class="avatar" src="photo.jpg" alt="Andrea Guyon"> -->
+              <span class="avatar" aria-hidden="true">AG</span>
+              <div><strong>Andrea Guyon</strong><span>Fondateur, conseiller hypothécaire</span></div>
+            </div>
+            <h3>Notre bureau</h3>
+            <address>Avenue des Baumettes 7<br>1020 Renens</address>
+            <p class="hours"><span>Lundi – samedi</span><span class="num">8h00 – 18h00</span></p>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Avenue+des+Baumettes+7,+1020+Renens" target="_blank" rel="noopener">Voir sur la carte</a>
+          </div>
+        </div>
+        <div>
+          <form class="contact" id="form" novalidate>
+            <div class="row2">
+              <div class="field"><label for="prenom">Prénom</label><input id="prenom" autocomplete="given-name" required></div>
+              <div class="field"><label for="nom">Nom</label><input id="nom" autocomplete="family-name" required></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required></div>
+              <div class="field"><label for="tel">Téléphone</label><input id="tel" type="tel" autocomplete="tel" placeholder="079 123 45 67" required></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label for="typebien">Le bien sera</label>
+                <select id="typebien">
+                  <option>Ma résidence principale</option>
+                  <option>Une résidence secondaire</option>
+                  <option>Un bien de rendement (location)</option>
+                </select></div>
+              <div class="field"><label for="horizon">Vous avez besoin du financement</label>
+                <select id="horizon">
+                  <option>Dans les 3 mois</option>
+                  <option>Dans 3 à 12 mois</option>
+                  <option>Dans plus d'un an</option>
+                  <option>Je me renseigne</option>
+                </select></div>
+            </div>
+            <div class="field"><label for="statut">Où en êtes-vous&nbsp;?</label>
+              <select id="statut">
+                <option>Je cherche encore un bien</option>
+                <option>J'ai trouvé un bien</option>
+                <option>Offre d'achat déposée / signature prochaine</option>
+                <option>Projet de construction</option>
+                <option>Mon hypothèque arrive à échéance</option>
+                <option>Je prépare ma retraite (garder mon bien)</option>
+                <option>Je souhaite vendre mon bien</option>
+              </select></div>
+            <fieldset class="situation">
+              <legend>Votre situation <span class="opt">(facultatif)</span></legend>
+              <p class="hint">Cochez ce qui vous concerne : ces éléments peuvent changer ce que les prêteurs acceptent.</p>
+              <div class="chips" id="chips">
+                <label><input type="checkbox" id="sit-donation" value="Donation ou avance d'hoirie attendue"><span>Donation ou avance d'hoirie attendue</span></label>
+                <label><input type="checkbox" id="sit-heritage" value="Héritage à venir"><span>Héritage à venir</span></label>
+                <label><input type="checkbox" id="sit-vente" value="Vente d'un bien en cours"><span>Vente d'un bien en cours</span></label>
+                <label><input type="checkbox" id="sit-bonus" value="Bonus ou revenu variable"><span>Bonus ou revenu variable</span></label>
+                <label><input type="checkbox" id="sit-indep" value="Indépendant"><span>Indépendant</span></label>
+                <label><input type="checkbox" id="sit-deux" value="Achat à deux (hors mariage)"><span>Achat à deux (hors mariage)</span></label>
+                <label><input type="checkbox" id="sit-sep" value="Séparation ou divorce"><span>Séparation ou divorce</span></label>
+                <label><input type="checkbox" id="sit-etranger" value="Permis B, L ou frontalier"><span>Permis B, L ou frontalier</span></label>
+              </div>
+              <label for="msg" class="msg-label">Expliquez-nous en quelques mots</label>
+              <textarea id="msg" placeholder="Ex. : j'attends une donation de CHF 80 000 de mes parents à la fin de l'année."></textarea>
+            </fieldset>
+            <fieldset class="booking" id="book-lead">
+              <legend>Choisissez l'heure de votre appel</legend>
+              <p class="hint">Appel téléphonique de 30&nbsp;min avec Andrea Guyon. <span class="demo-note" hidden>Créneaux d'exemple dans cet aperçu.</span></p>
+              <div class="days" aria-label="Jour"></div>
+              <div class="times" aria-label="Heure"></div>
+              <p class="picked" aria-live="polite"></p>
+              <label class="check"><input type="checkbox" class="asap" id="asap-lead">Aucun créneau ne me convient : rappelez-moi dès que possible</label>
+            </fieldset>
+            <label class="check"><input type="checkbox" id="consent" required>J'accepte que mes données soient utilisées pour étudier ma demande de financement et être recontacté, conformément à la <a href="#confidentialite">politique de confidentialité</a>.</label>
+            <p class="err" id="err" hidden></p>
+            <button class="btn wide" type="submit" id="submit">Envoyer ma demande</button>
+          </form>
+          <div class="thanks" id="thanks" hidden>
+            <h3>Demande reçue, merci&nbsp;!</h3>
+            <p id="thanks-text"></p>
+            <p>Préparez si possible vos trois dernières fiches de salaire et votre dernière déclaration d'impôts.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <h2>Comment ça se passe</h2>
+      <p class="sub">Trois étapes, de la simulation à la signature.</p>
+      <ol class="steps">
+        <li><h3>Vous simulez</h3><p>Le calculateur vous indique en direct si votre projet respecte les critères de fonds propres et de tenue des charges.</p></li>
+        <li><h3>Nous comparons</h3><p>Votre dossier est saisi une seule fois et présenté à 40 prêteurs : banques, assurances, caisses de pension et fonds.</p></li>
+        <li><h3>Vous choisissez</h3><p>Nous vous présentons les offres côte à côte (taux, durée, conditions) et vous accompagnons jusqu'à la signature.</p></li>
+      </ol>
+    </section>
+
+    <section class="band">
+      <h2>Questions fréquentes</h2>
+      <div class="faq">
+        <details><summary>Combien de fonds propres me faut-il&nbsp;?</summary><p>En général 20&nbsp;% du prix d'achat, dont au moins 10&nbsp;% qui ne proviennent pas de votre 2e pilier. Les frais de notaire et droits de mutation s'ajoutent et se paient aussi avec vos fonds propres.</p></details>
+        <details><summary>Mes leasings et crédits comptent-ils&nbsp;?</summary><p>Oui. Les mensualités de leasing et de crédit à la consommation sont déduites de votre revenu avant le calcul. Un leasing de CHF 500 par mois réduit ainsi votre revenu pris en compte de CHF 6&nbsp;000 par an, ce qui peut diminuer le prix que vous pouvez financer. Rembourser un crédit avant de demander une hypothèque peut donc faire la différence.</p></details>
+        <details><summary>Pourquoi un taux de 5&nbsp;% alors que les taux réels sont plus bas&nbsp;?</summary><p>Les prêteurs vérifient que vous pourriez assumer une hausse des taux. Ils calculent donc vos charges avec un taux théorique d'environ 5&nbsp;%, que vos charges ne doivent pas dépasser un tiers de votre revenu brut.</p></details>
+        <details><summary>Quand renouveler mon hypothèque&nbsp;?</summary><p>Idéalement 12 à 18 mois avant l'échéance. Beaucoup de prêteurs permettent de fixer le taux à l'avance, ce qui laisse le temps de comparer sans pression.</p></details>
+        <details><summary>Qu'est-ce que l'amortissement, et sur combien de temps&nbsp;?</summary>
+          <p>Amortir, c'est rembourser une partie de sa dette. Ce n'est pas obligatoire sur toute l'hypothèque : seule la part qui dépasse les deux tiers de la valeur du bien (l'hypothèque «&nbsp;de 2e rang&nbsp;») doit être remboursée.</p>
+          <p>Elle doit l'être en 15&nbsp;ans au maximum, et au plus tard à l'âge de la retraite. Plus on achète tard, plus le délai est court, et plus chaque versement est élevé.</p>
+          <p>Exemple : un bien de CHF 950&nbsp;000 financé à 80&nbsp;%, soit CHF 126&nbsp;667 à amortir. À 40&nbsp;ans, vous avez 15&nbsp;ans, soit environ CHF 8&nbsp;400 par an. À 58&nbsp;ans, il ne reste que 7&nbsp;ans avant 65&nbsp;ans, soit environ CHF 18&nbsp;100 par an, plus du double.</p></details>
+        <details><summary>Amortissement direct ou indirect : quelle différence&nbsp;?</summary>
+          <p><strong>En direct</strong>, vous versez chaque année l'amortissement à votre prêteur. Votre dette baisse, et vos intérêts avec elle. Mais cet argent n'est plus disponible : il est dans les murs. Et comme vous payez moins d'intérêts, vous en déduisez moins de votre revenu imposable. D'année en année, vos impôts augmentent donc un peu.</p>
+          <p><strong>En indirect</strong>, vous ne remboursez pas le prêteur tout de suite. Vous versez l'amortissement sur un 3e pilier, en banque ou en assurance, que le prêteur prend en gage. Ce compte reste à votre nom, mais vous ne pouvez pas en disposer librement tant qu'il garantit le prêt. Ce mode présente deux avantages fiscaux :</p>
+          <ul>
+            <li>vos versements sur le 3e pilier se déduisent de votre revenu imposable, dans la limite du plafond annuel ;</li>
+            <li>votre dette reste la même, donc vos intérêts déductibles aussi : vos impôts n'augmentent pas au fil des années.</li>
+          </ul>
+          <p>À l'échéance, le capital du 3e pilier sert à rembourser d'un coup la part à amortir.</p></details>
+        <details><summary>Lequel choisir&nbsp;?</summary>
+          <p>Cela dépend de votre revenu, de votre âge et de vos projets. L'indirect est souvent plus intéressant fiscalement quand le revenu est élevé. Le direct réduit plus vite vos intérêts et votre dette, ce qui aide à <a href="#retraite">garder son bien à la retraite</a>, quand le revenu baisse. Votre conseiller compare les deux sur vos chiffres réels avant de choisir.</p></details>
+        <details><summary>Quels frais s'ajoutent au prix d'achat&nbsp;?</summary><p>Les droits de mutation, les frais de notaire et de registre foncier, et la création de la cédule hypothécaire. Selon le canton, comptez environ 2,5 à 5&nbsp;% du prix. Ils se paient avec vos fonds propres, en plus des 20&nbsp;% exigés : le simulateur les déduit pour vous.</p></details>
+        <details><summary>Pouvez-vous m'aider à vendre mon bien&nbsp;?</summary><p>Oui. Faisability travaille en étroite collaboration avec des courtiers immobiliers pour la vente de biens. Ils s'occupent de l'estimation et de la mise en vente ; nous préparons le remboursement de votre hypothèque actuelle, y compris une éventuelle indemnité de sortie, et le financement de votre prochain achat. Vous n'avez qu'un seul interlocuteur pour l'ensemble.</p></details>
+        <details><summary>Combien me coûte votre accompagnement&nbsp;?</summary><p>Rien. Quand vous signez une hypothèque par notre intermédiaire, c'est le prêteur qui nous verse une commission. Sans signature, vous ne nous devez rien.</p></details>
+      </div>
+    </section>
+  </div>
+
+  <div id="view-contact" hidden>
+    <section class="band first">
+      <div class="lead">
+        <div>
+          <div class="eyebrow">Nous contacter</div>
+          <h2>Réservez un appel avec Andrea Guyon</h2>
+          <p class="sub">Choisissez l'heure qui vous convient : Andrea vous appelle au numéro indiqué. Une question simple&nbsp;? Écrivez-la, la réponse arrive par e-mail.</p>
+          <div class="office">
+            <div class="advisor">
+              <span class="avatar" aria-hidden="true">AG</span>
+              <div><strong>Andrea Guyon</strong><span>Fondateur, conseiller hypothécaire</span></div>
+            </div>
+            <h3>Notre bureau</h3>
+            <address>Avenue des Baumettes 7<br>1020 Renens</address>
+            <p class="hours"><span>Lundi – samedi</span><span class="num">8h00 – 18h00</span></p>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Avenue+des+Baumettes+7,+1020+Renens" target="_blank" rel="noopener">Voir sur la carte</a>
+          </div>
+        </div>
+        <div>
+          <form class="contact" id="cform" novalidate>
+            <div class="row2">
+              <div class="field"><label for="c-prenom">Prénom</label><input id="c-prenom" autocomplete="given-name" required></div>
+              <div class="field"><label for="c-nom">Nom</label><input id="c-nom" autocomplete="family-name" required></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label for="c-email">E-mail</label><input id="c-email" type="email" autocomplete="email" required></div>
+              <div class="field"><label for="c-tel">Téléphone</label><input id="c-tel" type="tel" autocomplete="tel" placeholder="079 123 45 67" required></div>
+            </div>
+            <div class="field"><label for="c-sujet">Votre demande concerne</label>
+              <select id="c-sujet">
+                <option>Un achat ou une construction</option>
+                <option>Le renouvellement de mon hypothèque</option>
+                <option>Garder mon bien à la retraite</option>
+                <option>La vente de mon bien</option>
+                <option>Une question générale</option>
+                <option>Un partenariat (agence, courtier, promoteur)</option>
+              </select></div>
+            <div class="field"><label for="c-msg">Message <span class="opt">(facultatif)</span></label>
+              <textarea id="c-msg" placeholder="Décrivez votre projet ou posez votre question."></textarea></div>
+            <fieldset class="booking" id="book-contact">
+              <legend>Choisissez l'heure de votre appel</legend>
+              <p class="hint">Appel téléphonique de 30&nbsp;min avec Andrea Guyon. <span class="demo-note" hidden>Créneaux d'exemple dans cet aperçu.</span></p>
+              <div class="days" aria-label="Jour"></div>
+              <div class="times" aria-label="Heure"></div>
+              <p class="picked" aria-live="polite"></p>
+              <label class="check"><input type="checkbox" class="asap" id="asap-contact">Aucun créneau ne me convient : rappelez-moi dès que possible</label>
+            </fieldset>
+            <label class="check"><input type="checkbox" id="c-consent" required>J'accepte que mes données soient utilisées pour traiter ma demande et être recontacté, conformément à la <a href="#confidentialite">politique de confidentialité</a>.</label>
+            <p class="err" id="c-err" hidden></p>
+            <button class="btn wide" type="submit" id="c-submit">Envoyer</button>
+          </form>
+          <div class="thanks" id="cthanks" hidden>
+            <h3>C'est noté, merci&nbsp;!</h3>
+            <p id="cthanks-text"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="view-confidentialite" hidden>
+    <article class="doc">
+      <div class="eyebrow">Protection des données</div>
+      <h1>Politique de confidentialité</h1>
+      <p class="updated">Version du 13 novembre 2026</p>
+      <p>Pour étudier votre financement, nous avons besoin d'informations personnelles, parfois financières. Cette page explique quelles données nous recueillons, pourquoi, avec qui nous les partageons et quels sont vos droits, conformément à la loi fédérale sur la protection des données (nLPD).</p>
+
+      <h2>1. Qui est responsable de vos données</h2>
+      <p>Andrea Guyon, Faisability, Avenue des Baumettes 7, 1020 Renens, Suisse. Pour toute question sur vos données, écrivez-nous à cette adresse ou via l'onglet <a href="#contact">Nous contacter</a> en choisissant « Une question générale ».</p>
+
+      <h2>2. Les données que nous recueillons</h2>
+      <p>Uniquement ce que vous saisissez vous-même :</p>
+      <ul>
+        <li><strong>Identité et contact</strong> : prénom, nom, e-mail, téléphone.</li>
+        <li><strong>Votre projet</strong> : type de parcours (achat, renouvellement, vente, retraite), prix ou valeur du bien, canton, type de bien, échéance, horizon, avancement du projet.</li>
+        <li><strong>Votre situation financière</strong> : âge, revenu du ménage, fonds propres, hypothèque, rente prévue, et les éléments que vous cochez ou décrivez (donation, héritage, indépendant, séparation, permis de séjour…).</li>
+        <li><strong>Votre rendez-vous</strong> : le créneau d'appel choisi.</li>
+      </ul>
+      <p>Les montants saisis dans le calculateur restent dans votre navigateur tant que vous n'envoyez pas de demande. Nous ne vous demandons aucune donnée sensible au sens de la loi, comme des informations sur votre santé : merci de ne pas en indiquer dans les champs libres.</p>
+
+      <h2>3. Pourquoi nous les utilisons</h2>
+      <ul>
+        <li>Vous rappeler à l'heure choisie et répondre à votre demande.</li>
+        <li>Étudier la faisabilité de votre projet et préparer votre dossier de financement.</li>
+        <li>Avec votre accord, présenter votre dossier à des prêteurs pour obtenir des offres.</li>
+        <li>Respecter nos obligations légales, notamment de conservation des documents commerciaux.</li>
+      </ul>
+      <p>Nous n'utilisons pas vos données pour de la publicité et nous ne les vendons jamais.</p>
+
+      <h2>4. Avec qui nous les partageons</h2>
+      <ul>
+        <li><strong>Notre plateforme de courtage hypothécaire et les prêteurs</strong> (banques, assurances, caisses de pension, fonds) : uniquement si vous nous mandatez pour rechercher un financement, et seulement les informations nécessaires à l'étude de votre dossier.</li>
+        <li><strong>Google</strong> (Google Sheets, Gmail, Google Agenda) : outils qui reçoivent et enregistrent votre demande et votre rendez-vous.</li>
+        <li><strong>Netlify</strong> : hébergement du site.</li>
+        <li><strong>Google Fonts</strong> : les polices du site sont chargées depuis les serveurs de Google, qui reçoivent à cette occasion votre adresse IP.</li>
+      </ul>
+      <p>Si votre projet le demande, par exemple pour une vente, nous pouvons aussi transmettre vos coordonnées à un notaire ou à une agence immobilière, toujours avec votre accord préalable.</p>
+
+      <h2>5. Transferts à l'étranger</h2>
+      <p>Google et Netlify peuvent traiter des données aux États-Unis ou dans l'Union européenne. Le Conseil fédéral reconnaît que l'Union européenne offre un niveau de protection adéquat. Pour les États-Unis, les transferts reposent sur le Swiss-U.S. Data Privacy Framework lorsque le prestataire y est certifié, ou sur des clauses contractuelles types reconnues par le Préposé fédéral.</p>
+
+      <h2>6. Combien de temps nous les gardons</h2>
+      <ul>
+        <li>Demande sans suite : effacée au plus tard 24 mois après le dernier contact.</li>
+        <li>Dossier de client : conservé 10 ans après la fin du mandat, durée de conservation des documents commerciaux prévue par le Code des obligations.</li>
+      </ul>
+
+      <h2>7. Calculs et décisions</h2>
+      <p>Les résultats du calculateur sont des estimations indicatives. Aucune décision n'est prise automatiquement : chaque dossier est examiné par un conseiller, et la décision de financement appartient au prêteur.</p>
+
+      <h2>8. Cookies et mesure d'audience</h2>
+      <p>Le site n'utilise ni cookies, ni outils de mesure d'audience, ni pixels publicitaires. Si cela change, nous mettrons cette page à jour avant de le faire.</p>
+
+      <h2>9. Sécurité</h2>
+      <p>Le site est servi uniquement en connexion chiffrée (HTTPS). L'accès aux demandes reçues est réservé à votre conseiller et protégé par une authentification sécurisée.</p>
+
+      <h2>10. Vos droits</h2>
+      <p>Vous pouvez à tout moment :</p>
+      <ul>
+        <li>demander à savoir quelles données nous détenons sur vous ;</li>
+        <li>les faire corriger ou effacer ;</li>
+        <li>vous opposer à leur utilisation ou retirer votre accord ;</li>
+        <li>recevoir vos données dans un format courant.</li>
+      </ul>
+      <p>Il suffit de nous écrire (voir le point 1). Nous répondons en principe dans les 30 jours. Si vous estimez que vos droits ne sont pas respectés, vous pouvez vous adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT), à Berne.</p>
+
+      <h2>11. Modifications</h2>
+      <p>Nous pouvons adapter cette politique, par exemple si nous changeons d'outils. La version en vigueur est toujours celle publiée sur cette page, avec sa date.</p>
+      <p><a href="#">Retour au site</a></p>
+    </article>
+  </div>
+
+  <div id="view-mentions" hidden>
+    <article class="doc">
+      <div class="eyebrow">Informations légales</div>
+      <h1>Mentions légales</h1>
+      <h2>Éditeur du site</h2>
+      <p>Faisability<br>Andrea Guyon, fondateur et conseiller hypothécaire<br>Avenue des Baumettes 7, 1020 Renens, Suisse<br>Contact : via l'onglet <a href="#contact">Nous contacter</a></p>
+      <p>N° FINMA : F01541757<br>Forme juridique et n° IDE : [à compléter]</p>
+
+      <h2>Nature des informations</h2>
+      <p>Les calculs et taux affichés sur ce site sont indicatifs. Ils ne constituent ni une offre de financement, ni une garantie d'octroi. Les conditions définitives dépendent de l'examen de votre dossier par le prêteur. Les taux indiqués sont les plus bas publiés sur le marché à la date mentionnée et peuvent changer à tout moment.</p>
+
+      <h2>Rémunération</h2>
+      <p>Notre accompagnement est gratuit pour vous. Lorsqu'un financement est conclu par notre intermédiaire, nous recevons une commission du prêteur retenu.</p>
+
+      <h2>Responsabilité</h2>
+      <p>Nous apportons le plus grand soin aux informations publiées, mais ne pouvons garantir qu'elles soient complètes ou à jour en permanence. Nous déclinons toute responsabilité pour les décisions prises sur la seule base des calculs du site, sans conseil personnalisé. Les liens vers des sites externes sont fournis à titre d'information ; leur contenu relève de leurs éditeurs.</p>
+
+      <h2>Droits d'auteur</h2>
+      <p>Les textes, calculateurs et le graphisme de ce site appartiennent à Faisability. Toute reproduction sans autorisation écrite est interdite.</p>
+
+      <h2>Données personnelles</h2>
+      <p>Voir notre <a href="#confidentialite">politique de confidentialité</a>.</p>
+      <p><a href="#">Retour au site</a></p>
+    </article>
+  </div>
+  </main>
+
+  <footer>
+    <div class="legal">
+      <span>© 2026 Faisability · Courtage hypothécaire · Avenue des Baumettes 7, 1020 Renens · Lun–sam 8h–18h</span>
+      <span class="ids">Andrea Guyon · N° FINMA F01541757</span>
+    </div>
+    <span><a href="#mentions-legales">Mentions légales</a> · <a href="#confidentialite">Politique de confidentialité</a></span>
+  </footer>
+</div>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FinancialService","name":"Faisability",
+ "description":"Faisabilité hypothécaire et courtage pour l'achat, la construction et le renouvellement d'hypothèque en Suisse romande.",
+ "address":{"@type":"PostalAddress","streetAddress":"Avenue des Baumettes 7","postalCode":"1020","addressLocality":"Renens","addressRegion":"VD","addressCountry":"CH"},
+ "openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"08:00","closes":"18:00"}],
+ "founder":{"@type":"Person","name":"Andrea Guyon"},
+ "areaServed":["Vaud","Genève","Fribourg","Valais","Neuchâtel","Jura"]}
+</script>
+<script>
+// URL de votre Google Apps Script (voir le guide). Laisser vide = mode démonstration.
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxhu8dkOyYi5_dYl1sIZYh4isojFLpC8UgpUG9Yo9XsyQAWODZ1Z1LDYgivH-zvOnM/exec";
+
+const $ = id => document.getElementById(id);
+let mode = "achat";
+let last = {};
+const chf = n => "CHF " + Math.round(n).toLocaleString("fr-CH").replace(/[  ,]/g, "’");
+const pct = n => (n * 100).toFixed(1).replace(".", ",") + " %";
+const val = id => Number(($(id).value || "").replace(/[^\d]/g, "")) || 0;
+
+// Amortissement du 2e rang : 15 ans au plus, et au plus tard à 65 ans
+const RETRAITE = 65;
+const anneesAmort = () => { const a = Number($("age").value) || 0; return a ? Math.max(1, Math.min(15, RETRAITE - a)) : 15; };
+function charges(price, loan, yrs = 15) {
+  const amort = Math.max(0, loan - price * 2 / 3) / yrs;
+  return loan * 0.05 + amort + price * 0.01;
+}
+function maxPrice(fp, rev, f, yrs = 15) {
+  let lo = 0, hi = 20000000;
+  for (let i = 0; i < 60; i++) {
+    const p = (lo + hi) / 2, apport = fp - p * f, loan = Math.max(0, p - apport);
+    const ok = apport >= p * 0.2 && charges(p, loan, yrs) <= rev / 3;
+    ok ? lo = p : hi = p;
+  }
+  return lo;
+}
+
+// Frais d'achat estimés (part acheteur), en % du prix : droits de mutation
+// cantonaux et communaux + notaire, registre foncier et cédule (~1,2 %). Estimation prudente.
+const FRAIS = { "Vaud": 0.045, "Genève": 0.042, "Fribourg": 0.042, "Valais": 0.027,
+  "Neuchâtel": 0.045, "Jura": 0.033, "Berne": 0.030, "Autre canton": 0.040 };
+
+// Taux indicatifs : à mettre à jour chaque semaine.
+// Une seule mise à jour ici alimente le haut de page et la section « coût réel ».
+const TAUX = { date: "13.11.2026", lignes: [
+  ["SARON", "Variable, révisé chaque trimestre", 0.77, "SARON"],
+  ["Fixe 5 ans", "Taux bloqué 5 ans", 1.46, "5 ans"],
+  ["Fixe 10 ans", "Taux bloqué 10 ans", 1.60, "10 ans"],
+  ["Fixe 15 ans", "Taux bloqué 15 ans", 1.71, "15 ans"] ] };
+
+function renderBest() {
+  $("best-date").textContent = TAUX.date;
+  const g = $("best-grid"); g.textContent = "";
+  TAUX.lignes.forEach(([, , t, short]) => {
+    const d = document.createElement("div"), dt = document.createElement("dt"), dd = document.createElement("dd");
+    dt.textContent = short; dd.textContent = t.toFixed(2).replace(".", ",") + " %";
+    d.append(dt, dd); g.append(d);
+  });
+}
+renderBest();
+
+function renderRates(loan, amort) {
+  $("r-loan").textContent = chf(loan);
+  const list = $("rates-list"); list.textContent = "";
+  const max = Math.max(...TAUX.lignes.map(l => l[2]));
+  TAUX.lignes.forEach(([name, sub, t]) => {
+    const row = document.createElement("div"); row.className = "rate-row";
+    const n = document.createElement("div"); n.className = "name"; n.textContent = name;
+    const s = document.createElement("small"); s.textContent = sub; n.append(s);
+    const r = document.createElement("div"); r.className = "rate"; r.textContent = "dès " + t.toFixed(2).replace(".", ",") + " %";
+    const bar = document.createElement("div"); bar.className = "bar"; const i = document.createElement("i"); i.style.width = (t / max * 100) + "%"; bar.append(i);
+    const c = document.createElement("div"); c.className = "cost"; c.textContent = chf(loan * t / 100 / 12) + " ";
+    const per = document.createElement("small"); per.textContent = "/ mois"; c.append(per);
+    row.append(n, r, bar, c); list.append(row);
+  });
+  $("rates-note").textContent = `Taux indicatifs les plus bas publiés sur le marché au ${TAUX.date}, pour un bon dossier. Votre taux dépend de votre situation et du prêteur.` +
+    (amort > 0 ? ` À ajouter : amortissement d'environ ${chf(amort / 12)} par mois et frais d'entretien.` : " À ajouter : frais d'entretien du bien.");
+}
+
+const FRAIS_VENTE = 0.03; // courtage et frais de vente estimés, en % du prix
+const setM = (i, label, value) => { $(["m1l","m2l","m3l","m4l","m5l","m-last-label"][i]).textContent = label;
+  $(["m-hypo","m-ltv","m3","m4","m-charges","m-last"][i]).textContent = value; };
+const moisAnnee = v => v ? v.split("-").reverse().join(".") : "";
+
+function compute() {
+  const price = val("prix"), revBrut = val("rev"), credits = val("credits") * 12;
+  const rev = Math.max(0, revBrut - credits); // revenu retenu par le prêteur
+  const f = FRAIS[$("canton").value] ?? 0.04;
+  const yrs = anneesAmort(), age = Number($("age").value) || 0;
+  renderAgeHint(age, yrs);
+  let loan, fp, frais = 0, apport, ratio = 0, ltv = 0, ch = 0, amort = 0, cls = "ok", txt, extra = {};
+
+  if (mode === "vente") {
+    loan = val("hypo");
+    const fv = price * FRAIS_VENTE, cap = Math.max(0, price - loan - fv);
+    const rachat = $("vprojet").value.startsWith("Je rachète");
+    const next = rachat ? maxPrice(cap, rev, f, yrs) : 0;
+    const ech = $("ech").value, fixeEnCours = ech && new Date(ech + "-01") > new Date();
+    txt = `Capital libéré estimé : ${chf(cap)}`;
+    if (!price) { cls = "warn"; txt = "Indiquez le prix de vente espéré"; }
+    else if (loan + fv > price) { cls = "bad"; txt = "Le prix de vente ne couvre pas l'hypothèque et les frais"; }
+    if (price && fixeEnCours) { if (cls === "ok") cls = "warn"; txt += ` · taux fixe jusqu'au ${moisAnnee(ech)} : une indemnité de sortie est possible`; }
+    $("verdict").className = "verdict " + cls; $("verdict-text").textContent = txt;
+    $("gauge-wrap").hidden = true;
+    setM(0, "Hypothèque à rembourser", chf(loan));
+    setM(1, "Frais de vente estimés", chf(fv));
+    setM(2, "Capital libéré", chf(cap));
+    setM(3, "Part du prix libérée", pct(price ? cap / price : 0));
+    setM(4, rachat ? "Fonds propres pour le rachat" : "Montant disponible", chf(cap));
+    setM(5, rachat ? "Prix max. du prochain bien" : "Prochain bien", rachat && rev ? chf(next) : "—");
+    const nextLoan = rachat ? Math.max(0, next - (cap - next * f)) : loan;
+    renderRates(nextLoan, rachat ? Math.max(0, nextLoan - next * 2 / 3) / yrs : 0);
+    last = { parcours: "Vente", age, prix: price, hypotheque: loan, capitalLibere: Math.round(cap), projetApres: $("vprojet").value,
+      revenu: revBrut, creditsMensuels: credits / 12, verdict: txt, canton: $("canton").value, echeance: ech || "" };
+    fillSummary([["Prix de vente espéré", chf(price)], ["Hypothèque à rembourser", chf(loan)],
+      ["Frais de vente estimés", chf(fv)], ["Capital libéré", chf(cap)], ["Après la vente", $("vprojet").value]]);
+    return;
+  }
+
+  if (mode === "achat") { fp = val("fp"); frais = price * f; apport = Math.max(0, fp - frais); loan = Math.max(0, price - apport); }
+  else { loan = val("hypo"); fp = price - loan; apport = fp; }
+  ltv = price ? loan / price : 0;
+  ch = price ? charges(price, loan, yrs) : 0;
+  ratio = rev ? ch / rev : 0;
+  amort = Math.max(0, loan - price * 2 / 3) / yrs;
+
+  txt = "Projet finançable selon les critères usuels";
+  if (!price || !rev) { cls = "warn"; txt = "Complétez les montants"; }
+  else if (ltv > 0.8) { cls = "bad"; txt = mode === "achat" ? "Fonds propres insuffisants une fois les frais d'achat payés" : "Financement supérieur à 80 % de la valeur"; }
+  else if (ratio > 0.38) { cls = "bad"; txt = "Charges trop élevées par rapport au revenu"; }
+  else if (ratio > 1 / 3) { cls = "warn"; txt = "À la limite : certains prêteurs peuvent accepter"; }
+
+  $("verdict").className = "verdict " + cls;
+  $("verdict-text").textContent = txt + (price && rev ? " · charges " + pct(ratio) + (credits ? " du revenu, leasings et crédits déduits" : " du revenu") : "");
+  $("gauge-wrap").hidden = false;
+  $("gauge").style.width = Math.min(100, ratio / 0.5 * 100) + "%";
+  $("gauge").style.background = `var(--${cls === "ok" ? "fir" : cls})`;
+  setM(0, "Hypothèque", chf(loan));
+  setM(1, "Taux de financement", pct(ltv));
+  setM(4, "Charges théoriques / an", chf(ch));
+  if (mode === "achat") {
+    setM(2, "Frais d'achat estimés", chf(frais));
+    setM(3, "Fonds propres après frais", chf(apport));
+    setM(5, "Prix maximal estimé", chf(maxPrice(fp, rev, f, yrs)));
+  } else {
+    setM(2, "Vos fonds propres dans le bien", chf(Math.max(0, fp)));
+    setM(3, "Amortissement requis / an", chf(amort));
+    setM(5, "Charge mensuelle théorique", chf(ch / 12));
+  }
+  renderRates(loan, amort);
+
+  last = { parcours: mode === "achat" ? "Achat / construction" : "Renouvellement", age, prix: price, fondsPropres: fp, hypotheque: loan,
+    fraisAchat: Math.round(frais), revenu: revBrut, creditsMensuels: credits / 12, nantissement: +(ltv * 100).toFixed(1), tenueCharges: +(ratio * 100).toFixed(1), verdict: txt,
+    canton: $("canton").value, echeance: mode === "renouv" ? $("ech").value : "" };
+
+  const rows = [[mode === "achat" ? "Prix du bien" : "Valeur du bien", chf(price)], ["Âge", age ? age + " ans" : "—"], ["Hypothèque", chf(loan)],
+    ["Revenu brut", chf(revBrut)], ["Tenue des charges", pct(ratio)]];
+  if (credits) rows.splice(rows.length - 1, 0, ["Leasings et crédits", chf(credits / 12) + " / mois"]);
+  if (mode === "achat") rows.splice(1, 0, ["Frais d'achat estimés", chf(frais)]);
+  if (mode === "renouv" && $("ech").value) rows.push(["Échéance", moisAnnee($("ech").value)]);
+  fillSummary(rows);
+}
+
+function renderAgeHint(age, yrs) {
+  const h = $("age-hint"); h.textContent = "";
+  if (!age || (yrs >= 15 && age < 55)) { h.hidden = true; return; }
+  h.hidden = false;
+  if (yrs < 15) h.append(`Amortissement calculé sur ${yrs} an${yrs > 1 ? "s" : ""} : il doit être terminé à ${RETRAITE} ans. `);
+  if (age >= 55) {
+    h.append("À la retraite, le prêteur refera le calcul avec votre rente. ");
+    const a = document.createElement("a"); a.href = "#retraite"; a.textContent = "Vérifier si je pourrai garder mon bien"; h.append(a);
+  }
+}
+
+function fillSummary(rows) {
+  const dl = $("summary"); dl.textContent = "";
+  rows.forEach(([k, v]) => { const d = document.createElement("div"), dt = document.createElement("dt"), dd = document.createElement("dd");
+    dt.textContent = k; dd.textContent = v; d.append(dt, dd); dl.append(d); });
+}
+
+function fmt(e) { const n = val(e.target.id); e.target.value = n ? n.toLocaleString("fr-CH").replace(/[  ,’]/g, " ") : ""; }
+["prix", "fp", "hypo", "rev", "credits"].forEach(id => { $(id).addEventListener("input", compute); $(id).addEventListener("blur", fmt); });
+$("age").addEventListener("input", compute);
+["ech", "canton", "vprojet"].forEach(id => $(id).addEventListener("change", compute));
+let echTouched = false, echDefault = "";
+$("ech").addEventListener("change", () => { echTouched = true; });
+const NOTE_ACHAT = $("calc-note").textContent;
+const NOTE_VENTE = "Calcul indicatif : frais de vente estimés à 3 % du prix. L'impôt sur le gain immobilier n'est pas déduit : il dépend du canton et de la durée de possession.";
+
+const LABELS = {
+  achat:  { prix: "Prix du bien", hypo: "Hypothèque actuelle", ech: "Échéance actuelle", canton: "Canton du bien", statut: "J'ai trouvé un bien" },
+  renouv: { prix: "Valeur estimée du bien", hypo: "Hypothèque actuelle", ech: "Échéance actuelle", canton: "Canton du bien", statut: "Mon hypothèque arrive à échéance" },
+  vente:  { prix: "Prix de vente espéré", hypo: "Hypothèque restante", ech: "Fin de votre taux fixe (si fixe)", canton: "Canton du prochain bien", statut: "Je souhaite vendre mon bien" } };
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  const L = LABELS[mode];
+  $("prix-label").textContent = L.prix; $("hypo-label").textContent = L.hypo;
+  $("ech-label").textContent = L.ech; $("canton-label").textContent = L.canton;
+  $("f-fp").hidden = mode !== "achat"; $("f-hypo").hidden = mode === "achat";
+  $("f-ech").hidden = mode === "achat"; $("f-canton").hidden = mode === "renouv";
+  $("f-vprojet").hidden = mode !== "vente";
+  $("sale-note").hidden = mode !== "vente";
+  if (!echTouched) $("ech").value = mode === "vente" ? "" : echDefault;
+  $("calc-note").textContent = mode === "vente" ? NOTE_VENTE : NOTE_ACHAT;
+  $("calc-cta").textContent = mode === "vente" ? "Préparer ma vente avec Andrea Guyon" : "Recevoir mes offres de taux";
+  $("statut").value = L.statut;
+  compute();
+}));
+
+/* ---------- Créneaux d'appel (Google Agenda via Apps Script) ---------- */
+const TZ = "Europe/Zurich";
+const fDay = new Intl.DateTimeFormat("fr-CH", { timeZone: TZ, weekday: "short" });
+const fDate = new Intl.DateTimeFormat("fr-CH", { timeZone: TZ, day: "numeric", month: "short" });
+const fTime = new Intl.DateTimeFormat("fr-CH", { timeZone: TZ, hour: "2-digit", minute: "2-digit" });
+const fLong = new Intl.DateTimeFormat("fr-CH", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+const dayKey = d => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d);
+
+let slotsPromise = null;
+function getSlots(force) { if (!slotsPromise || force) slotsPromise = fetchSlots(); return slotsPromise; }
+async function fetchSlots() {
+  if (ENDPOINT) {
+    try { const r = await fetch(ENDPOINT + "?action=slots"); const j = await r.json(); return { list: (j.slots || []).map(s => new Date(s)) }; }
+    catch (x) { return { list: [], error: true }; }
+  }
+  // Aperçu sans agenda relié : créneaux d'exemple, lun–sam 8h–18h
+  const list = [], now = Date.now();
+  for (let i = 0; i < 14; i++) {
+    const day = new Date(); day.setDate(day.getDate() + i);
+    if (day.getDay() === 0) continue;
+    for (let m = 8 * 60; m < 18 * 60; m += 30) {
+      const s = new Date(day); s.setHours(0, m, 0, 0);
+      if (s - now < 2 * 3600e3 || (i * 3 + m / 30) % 4 === 0) continue;
+      list.push(s);
+    }
+  }
+  return { list, demo: true };
+}
+
+function makePicker(root) {
+  const days = root.querySelector(".days"), times = root.querySelector(".times"),
+        picked = root.querySelector(".picked"), asap = root.querySelector(".asap");
+  const st = { value: null, day: null, groups: new Map() };
+  function renderTimes() {
+    times.textContent = "";
+    (st.groups.get(st.day) || []).forEach(s => {
+      const b = document.createElement("button"); b.type = "button"; b.textContent = fTime.format(s);
+      b.setAttribute("aria-pressed", String(!!st.value && +st.value === +s));
+      b.addEventListener("click", () => { st.value = s; picked.textContent = "Appel le " + fLong.format(s); renderTimes(); });
+      times.append(b);
+    });
+  }
+  function renderDays() {
+    days.textContent = "";
+    st.groups.forEach((list, k) => {
+      const b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-pressed", String(k === st.day));
+      const w = document.createElement("span"); w.textContent = fDay.format(list[0]);
+      const sm = document.createElement("small"); sm.textContent = fDate.format(list[0]);
+      b.append(w, sm);
+      b.addEventListener("click", () => { st.day = k; renderDays(); renderTimes(); });
+      days.append(b);
+    });
+  }
+  async function load(force) {
+    st.value = null; picked.textContent = ""; times.textContent = "";
+    days.textContent = "Chargement des disponibilités…";
+    const { list, error, demo } = await getSlots(force);
+    root.querySelector(".demo-note").hidden = !demo;
+    st.groups = new Map();
+    list.forEach(s => { const k = dayKey(s); if (!st.groups.has(k)) st.groups.set(k, []); st.groups.get(k).push(s); });
+    days.textContent = "";
+    if (!st.groups.size) {
+      const p = document.createElement("p"); p.className = "empty";
+      p.textContent = error ? "L'agenda ne répond pas pour le moment. Cochez la case ci-dessous : nous vous rappellerons."
+                            : "Aucun créneau libre ces deux prochaines semaines. Cochez la case ci-dessous : nous vous rappellerons.";
+      days.append(p); return;
+    }
+    st.day = st.groups.keys().next().value; renderDays(); renderTimes();
+  }
+  asap.addEventListener("change", () => root.classList.toggle("off", asap.checked));
+  load();
+  return { get value() { return asap.checked ? null : st.value; }, get asap() { return asap.checked; }, reload: () => load(true) };
+}
+
+/* ---------- Envoi des formulaires ---------- */
+async function send(payload) {
+  if (!ENDPOINT) return { ok: true };
+  const r = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+  try { return await r.json(); } catch (x) { return { ok: true }; }
+}
+function fail(err, msg, focusId) { err.textContent = msg; err.hidden = false; if (focusId) $(focusId).focus(); return false; }
+function checkPerson(p, err, picker) {
+  const need = ["prenom", "nom", "email", "tel"].map(k => p + k).find(id => !$(id).value.trim());
+  if (need) return fail(err, "Merci de remplir votre prénom, nom, e-mail et téléphone.", need);
+  if (!$(p + "email").validity.valid) return fail(err, "L'adresse e-mail semble incorrecte.", p + "email");
+  if (!picker.value && !picker.asap) return fail(err, "Choisissez l'heure de votre appel, ou cochez « rappelez-moi dès que possible ».");
+  if (!$(p + "consent").checked) return fail(err, "Cochez la case d'accord pour que nous puissions traiter votre demande.");
+  return true;
+}
+function person(p, picker) {
+  return { prenom: $(p + "prenom").value.trim(), nom: $(p + "nom").value.trim(), email: $(p + "email").value.trim(),
+    telephone: $(p + "tel").value.trim(), creneau: picker.value ? picker.value.toISOString() : "",
+    rappel: picker.value ? "Créneau réservé" : "Dès que possible", source: location.hostname || "aperçu", date: new Date().toISOString() };
+}
+function confirmText(pl) {
+  return pl.creneau
+    ? `Rendez-vous téléphonique le ${fLong.format(new Date(pl.creneau))}. Andrea Guyon vous appellera au ${pl.telephone}. Une invitation pour votre agenda arrive par e-mail.`
+    : "Andrea Guyon vous rappelle dès que possible, en principe le jour ouvrable suivant.";
+}
+async function submitWith(btn, err, picker, payload, onOk) {
+  const label = btn.textContent; btn.disabled = true; btn.textContent = "Envoi…";
+  try {
+    const res = await send(payload);
+    if (res.error === "slot_taken") { picker.reload(); fail(err, "Ce créneau vient d'être réservé par quelqu'un d'autre. Choisissez une autre heure."); }
+    else if (res.ok === false) throw new Error(res.error);
+    else onOk();
+  } catch (x) { fail(err, "L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez."); }
+  btn.disabled = false; btn.textContent = label;
+}
+
+/* ---------- Retraite : dette comparée à la future rente ---------- */
+let lastRetraite = "";
+function computeRetraite() {
+  const v = val("r-valeur"), l = val("r-hypo"), rev = val("r-rev");
+  const ch = l * 0.05 + v * 0.01, ratio = rev ? ch / rev : 0;
+  const supp = Math.max(0, (rev / 3 - v * 0.01) / 0.05), amort = Math.max(0, l - supp);
+  let cls = "ok", txt = "Votre bien reste finançable avec votre rente";
+  if (!v || !l || !rev) { cls = "warn"; txt = "Complétez les montants"; }
+  else if (ratio > 0.38) { cls = "bad"; txt = "Risque : le prêteur pourrait exiger un amortissement"; }
+  else if (ratio > 1 / 3) { cls = "warn"; txt = "À la limite : à préparer avec votre prêteur"; }
+  $("r-verdict").className = "verdict " + cls; $("r-verdict-text").textContent = txt;
+  $("r-ch").textContent = chf(ch); $("r-ratio").textContent = pct(ratio);
+  $("r-supp").textContent = chf(supp); $("r-amort").textContent = chf(amort);
+  lastRetraite = `Valeur ${chf(v)} · hypothèque ${chf(l)} · rente prévue ${chf(rev)} · charges ${pct(ratio)} de la rente · à amortir ${chf(amort)}`;
+}
+["r-valeur", "r-hypo", "r-rev"].forEach(id => { $(id).addEventListener("input", computeRetraite); $(id).addEventListener("blur", fmt); });
+$("r-cta").addEventListener("click", () => { $("statut").value = "Je prépare ma retraite (garder mon bien)"; });
+computeRetraite();
+
+/* ---------- Champs réellement remplis par le visiteur ---------- */
+const touched = new Set();
+$("calc").addEventListener("input", e => { if (e.target.id) touched.add(e.target.id); }, true);
+const SIM_LABELS = { prix: "prix", fp: "fonds propres", hypo: "hypothèque", rev: "revenu", age: "âge" };
+function champsUtiles() {
+  if (mode === "achat") return ["prix", "fp", "rev", "age"];
+  if (mode === "renouv") return ["prix", "hypo", "rev", "age"];
+  return $("vprojet").value.startsWith("Je rachète") ? ["prix", "hypo", "rev", "age"] : ["prix", "hypo"];
+}
+function champsExemple() { return champsUtiles().filter(id => !touched.has(id)); }
+function majNoteResume() { $("summary-note").hidden = champsExemple().length < champsUtiles().length; }
+$("calc").addEventListener("input", majNoteResume);
+$("calc").addEventListener("click", majNoteResume);
+function simulationPourEnvoi() {
+  const ex = champsExemple();
+  if (ex.length === champsUtiles().length)
+    return { parcours: last.parcours, verdict: "Calculateur non rempli : chiffres à demander au téléphone" };
+  return { ...last, exemples: ex.map(id => SIM_LABELS[id]).join(", ") };
+}
+
+const pickLead = makePicker($("book-lead"));
+const pickContact = makePicker($("book-contact"));
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const err = $("err"); err.hidden = true;
+  if (!checkPerson("", err, pickLead)) return;
+  const lead = { type: "Simulation", ...simulationPourEnvoi(), ...person("", pickLead), statut: $("statut").value,
+    typeBien: $("typebien").value, horizon: $("horizon").value,
+    retraite: $("statut").value.startsWith("Je prépare ma retraite") ? lastRetraite : "",
+    situations: [...document.querySelectorAll("#chips input:checked")].map(c => c.value).join(" · "),
+    message: $("msg").value.trim() };
+  submitWith($("submit"), err, pickLead, lead, () => {
+    $("thanks-text").textContent = confirmText(lead); $("form").hidden = true; $("thanks").hidden = false;
+  });
+});
+
+$("cform").addEventListener("submit", e => {
+  e.preventDefault();
+  const err = $("c-err"); err.hidden = true;
+  if (!checkPerson("c-", err, pickContact)) return;
+  const msg = { type: "Contact", ...person("c-", pickContact), sujet: $("c-sujet").value, message: $("c-msg").value.trim() };
+  submitWith($("c-submit"), err, pickContact, msg, () => {
+    $("cthanks-text").textContent = confirmText(msg); $("cform").hidden = true; $("cthanks").hidden = false;
+  });
+});
+
+/* ---------- Onglets Simulation / Nous contacter ---------- */
+const VIEWS = { contact: "view-contact", confidentialite: "view-confidentialite", "mentions-legales": "view-mentions" };
+function route() {
+  const v = VIEWS[location.hash.slice(1)];
+  ["view-home", ...Object.values(VIEWS)].forEach(id => { $(id).hidden = id !== (v || "view-home"); });
+  $("nav-home").setAttribute("aria-current", v ? "false" : "page");
+  $("nav-contact").setAttribute("aria-current", v === "view-contact" ? "page" : "false");
+  if (v) window.scrollTo(0, 0);
+  else if (location.hash.length > 1) { const el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView(); }
+}
+addEventListener("hashchange", route);
+route();
+
+// Taux tenus à jour dans l'onglet « Taux » de votre Google Sheet (via le script)
+async function loadTaux() {
+  if (!ENDPOINT) return;
+  try {
+    const r = await fetch(ENDPOINT + "?action=rates"); const j = await r.json();
+    if (!j || !j.date || !Array.isArray(j.taux) || j.taux.length !== TAUX.lignes.length) return;
+    j.taux.forEach((t, i) => { const n = Number(String(t).replace(",", ".")); if (n > 0 && n < 10) TAUX.lignes[i][2] = n; });
+    TAUX.date = j.date; renderBest(); compute();
+  } catch (x) { /* on garde les taux intégrés */ }
+}
+loadTaux();
+
+const d = new Date(); d.setMonth(d.getMonth() + 14);
+echDefault = d.toISOString().slice(0, 7);
+$("ech").value = echDefault;
+compute();
+</script>
+</body>
+</html>
