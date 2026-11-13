@@ -976,7 +976,7 @@ function makePicker(root) {
 async function send(payload) {
   if (!ENDPOINT) return { ok: true };
   const r = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-  try { return await r.json(); } catch (x) { return { ok: true }; }
+  try { return await r.json(); } catch (x) { return { ok: false, error: "reponse_invalide" }; }
 }
 function fail(err, msg, focusId) { err.textContent = msg; err.hidden = false; if (focusId) $(focusId).focus(); return false; }
 function checkPerson(p, err, picker) {
@@ -1002,7 +1002,7 @@ async function submitWith(btn, err, picker, payload, onOk) {
   try {
     const res = await send(payload);
     if (res.error === "slot_taken") { picker.reload(); fail(err, "Ce créneau vient d'être réservé par quelqu'un d'autre. Choisissez une autre heure."); }
-    else if (res.ok === false) throw new Error(res.error);
+    else if (res.ok !== true) throw new Error(res.error || "echec");
     else onOk();
   } catch (x) { fail(err, "L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez."); }
   btn.disabled = false; btn.textContent = label;
